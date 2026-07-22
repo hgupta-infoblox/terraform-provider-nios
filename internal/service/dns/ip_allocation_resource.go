@@ -209,13 +209,27 @@ func (r *IPAllocationResource) Create(ctx context.Context, req resource.CreateRe
 
 	applyCliCredentialPasswords(payload.CliCredentials, cliModels)
 
-	apiRes, _, err := r.client.DNSAPI.
-		RecordHostAPI.
-		Create(ctx).
-		RecordHost(*payload).
-		ReturnFieldsPlus(readableAttributesForIPAllocation).
-		ReturnAsObject(1).
-		Execute()
+	var apiRes *dns.CreateRecordHostResponse
+
+	err := retry.Do(ctx, retry.TransientErrors, func(ctx context.Context) (int, error) {
+		var (
+			httpRes *http.Response
+			callErr error
+		)
+		apiRes, httpRes, callErr = r.client.DNSAPI.
+			RecordHostAPI.
+			Create(ctx).
+			RecordHost(*payload).
+			ReturnFieldsPlus(readableAttributesForIPAllocation).
+			ReturnAsObject(1).
+			Execute()
+
+		if httpRes != nil {
+			return httpRes.StatusCode, callErr
+		}
+		return 0, callErr
+	})
+
 	if err != nil {
 		if retry.IsAlreadyExistsErr(err) {
 			// Resource already exists, import required
