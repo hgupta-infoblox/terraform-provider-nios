@@ -11,6 +11,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema"
+	"github.com/hashicorp/terraform-plugin-framework/tfsdk"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
 	niosclient "github.com/infobloxopen/infoblox-nios-go-client/client"
@@ -104,6 +105,39 @@ func (r *IPAllocationResource) ValidateConfig(ctx context.Context, req resource.
 	}
 }
 
+func loadCliCredentialModelsFromConfig(ctx context.Context, config tfsdk.Config, diags *diag.Diagnostics) ([]RecordHostCliCredentialsModel, types.List) {
+	var cliCreds types.List
+	diags.Append(config.GetAttribute(ctx, path.Root("cli_credentials"), &cliCreds)...)
+	if diags.HasError() {
+		return nil, cliCreds
+	}
+
+	if cliCreds.IsNull() || cliCreds.IsUnknown() {
+		return nil, cliCreds
+	}
+
+	var cliModels []RecordHostCliCredentialsModel
+	diags.Append(cliCreds.ElementsAs(ctx, &cliModels, false)...)
+	if diags.HasError() {
+		return nil, cliCreds
+	}
+
+	return cliModels, cliCreds
+}
+
+func applyCliCredentialPasswords(payloadCreds []dns.RecordHostCliCredentials, cliModels []RecordHostCliCredentialsModel) {
+	for i := range cliModels {
+		if i >= len(payloadCreds) {
+			break
+		}
+
+		if !cliModels[i].Password.IsNull() && !cliModels[i].Password.IsUnknown() {
+			password := cliModels[i].Password.ValueString()
+			payloadCreds[i].Password = &password
+		}
+	}
+}
+
 func (r *IPAllocationResource) Create(ctx context.Context, req resource.CreateRequest, resp *resource.CreateResponse) {
 	var diags diag.Diagnostics
 	var data IPAllocationModel
@@ -141,32 +175,47 @@ func (r *IPAllocationResource) Create(ctx context.Context, req resource.CreateRe
 	// Save original IPv6 function call attributes
 	savedIPv6FuncCalls := r.saveNestedFuncCallAttrs(data.Ipv6addrs)
 
+	var (
+		planSnmp3 types.Object
+		authPwd   types.String
+		privPwd   types.String
+		cliModels []RecordHostCliCredentialsModel
+	)
+
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("snmp3_credential"), &planSnmp3)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("snmp3_credential").AtName("authentication_password"), &authPwd)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("snmp3_credential").AtName("privacy_password"), &privPwd)...)
+
+	cliModels, _ = loadCliCredentialModelsFromConfig(ctx, req.Config, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
 	payload := data.Expand(ctx, &resp.Diagnostics)
 	if resp.Diagnostics.HasError() {
 		return
 	}
 
-	var apiRes *dns.CreateRecordHostResponse
-
-	err := retry.Do(ctx, retry.TransientErrors, func(ctx context.Context) (int, error) {
-		var (
-			httpRes *http.Response
-			callErr error
-		)
-		apiRes, httpRes, callErr = r.client.DNSAPI.
-			RecordHostAPI.
-			Create(ctx).
-			RecordHost(*payload).
-			ReturnFieldsPlus(readableAttributesForIPAllocation).
-			ReturnAsObject(1).
-			Execute()
-
-		if httpRes != nil {
-			return httpRes.StatusCode, callErr
+	if !planSnmp3.IsNull() && payload.Snmp3Credential != nil {
+		if !authPwd.IsNull() && !authPwd.IsUnknown() {
+			ap := authPwd.ValueString()
+			payload.Snmp3Credential.AuthenticationPassword = &ap
 		}
-		return 0, callErr
-	})
+		if !privPwd.IsNull() && !privPwd.IsUnknown() {
+			pp := privPwd.ValueString()
+			payload.Snmp3Credential.PrivacyPassword = &pp
+		}
+	}
 
+	applyCliCredentialPasswords(payload.CliCredentials, cliModels)
+
+	apiRes, _, err := r.client.DNSAPI.
+		RecordHostAPI.
+		Create(ctx).
+		RecordHost(*payload).
+		ReturnFieldsPlus(readableAttributesForIPAllocation).
+		ReturnAsObject(1).
+		Execute()
 	if err != nil {
 		if retry.IsAlreadyExistsErr(err) {
 			// Resource already exists, import required
@@ -454,6 +503,36 @@ func (r *IPAllocationResource) Update(ctx context.Context, req resource.UpdateRe
 	// Prepare the update request while preserving DHCP settings
 	updateReq := data.Expand(ctx, &resp.Diagnostics)
 	preserveDHCPSettings(updateReq, &currentHost)
+
+	var (
+		updateAuthPwd   types.String
+		updatePrivPwd   types.String
+		updateCliModels []RecordHostCliCredentialsModel
+		updatePlanSnmp3 types.Object
+	)
+
+	resp.Diagnostics.Append(req.Plan.GetAttribute(ctx, path.Root("snmp3_credential"), &updatePlanSnmp3)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("snmp3_credential").AtName("authentication_password"), &updateAuthPwd)...)
+	resp.Diagnostics.Append(req.Config.GetAttribute(ctx, path.Root("snmp3_credential").AtName("privacy_password"), &updatePrivPwd)...)
+
+	updateCliModels, _ = loadCliCredentialModelsFromConfig(ctx, req.Config, &resp.Diagnostics)
+	if resp.Diagnostics.HasError() {
+		return
+	}
+
+	if !updatePlanSnmp3.IsNull() && updateReq.Snmp3Credential != nil {
+		if !updateAuthPwd.IsNull() && !updateAuthPwd.IsUnknown() {
+			ap := updateAuthPwd.ValueString()
+			updateReq.Snmp3Credential.AuthenticationPassword = &ap
+		}
+		if !updatePrivPwd.IsNull() && !updatePrivPwd.IsUnknown() {
+			pp := updatePrivPwd.ValueString()
+			updateReq.Snmp3Credential.PrivacyPassword = &pp
+		}
+	}
+
+	applyCliCredentialPasswords(updateReq.CliCredentials, updateCliModels)
+
 	updateReq.NetworkView = nil
 
 	// NOTE: Since UUID update with return fields is not supported, perform a separate GET after update to retrieve the latest state.
