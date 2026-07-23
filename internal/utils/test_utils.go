@@ -57,3 +57,7 @@ func GetGSSTSIGCertRef() string {
 func GetSyslogEndpointRef() string {
 	return os.Getenv("NIOS_SYSLOG_ENDPOINT_REF")
 }
+
+func GetNIOSGridMasterConfigAddrType() string {
+	return os.Getenv("NIOS_GRID_MASTER_CONFIG_ADDR_TYPE")
+}
