@@ -14,7 +14,6 @@ import (
 )
 
 func TestAccDxlEndpointDataSource_Filters(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	dataSourceName := "data.nios_misc_dxl_endpoint.test"
 	resourceName := "nios_misc_dxl_endpoint.test"
 	var v misc.DxlEndpoint
@@ -38,7 +37,6 @@ func TestAccDxlEndpointDataSource_Filters(t *testing.T) {
 }
 
 func TestAccDxlEndpointDataSource_ExtAttrFilters(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	dataSourceName := "data.nios_misc_dxl_endpoint.test"
 	resourceName := "nios_misc_dxl_endpoint.test"
 	var v misc.DxlEndpoint

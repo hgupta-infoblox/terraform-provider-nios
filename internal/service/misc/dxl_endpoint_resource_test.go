@@ -35,7 +35,6 @@ var (
 )
 
 func TestAccDxlEndpointResource_basic(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -65,7 +64,6 @@ func TestAccDxlEndpointResource_basic(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_disappears(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	resourceName := "nios_misc_dxl_endpoint.test"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -88,7 +86,6 @@ func TestAccDxlEndpointResource_disappears(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_Brokers(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_brokers"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -134,7 +131,6 @@ func TestAccDxlEndpointResource_Brokers(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_BrokersImportToken(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_brokers_import_token"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -166,7 +162,6 @@ func TestAccDxlEndpointResource_BrokersImportToken(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_ClientCertificateToken(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_client_certificate_token"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -198,7 +193,6 @@ func TestAccDxlEndpointResource_ClientCertificateToken(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_Comment(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_comment"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -229,7 +223,6 @@ func TestAccDxlEndpointResource_Comment(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_Disable(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_disable"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -260,7 +253,6 @@ func TestAccDxlEndpointResource_Disable(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_ExtAttrs(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_extattrs"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -297,7 +289,6 @@ func TestAccDxlEndpointResource_ExtAttrs(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_LogLevel(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_log_level"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -340,7 +331,6 @@ func TestAccDxlEndpointResource_LogLevel(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_Name(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_name"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -372,7 +362,6 @@ func TestAccDxlEndpointResource_Name(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_OutboundMemberType(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_outbound_member_type"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -403,7 +392,6 @@ func TestAccDxlEndpointResource_OutboundMemberType(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_OutboundMembers(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_outbound_members"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -429,7 +417,6 @@ func TestAccDxlEndpointResource_OutboundMembers(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_TemplateInstance(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_template_instance"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -454,7 +441,6 @@ func TestAccDxlEndpointResource_TemplateInstance(t *testing.T) {
 	})
 }
 func TestAccDxlEndpointResource_Timeout(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_timeout"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -484,7 +470,6 @@ func TestAccDxlEndpointResource_Timeout(t *testing.T) {
 	})
 }
 func TestAccDxlEndpointResource_Topics(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	t.Skip("Additional config is required to run this test")
 	var resourceName = "nios_misc_dxl_endpoint.test_topics"
 	var v misc.DxlEndpoint
@@ -522,7 +507,6 @@ func TestAccDxlEndpointResource_Topics(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_VendorIdentifier(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_vendor_identifier"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")
@@ -553,7 +537,6 @@ func TestAccDxlEndpointResource_VendorIdentifier(t *testing.T) {
 }
 
 func TestAccDxlEndpointResource_WapiUserName(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_misc_dxl_endpoint.test_wapi_user_name"
 	var v misc.DxlEndpoint
 	name := acctest.RandomNameWithPrefix("dxl-endpoint")

@@ -17,6 +17,7 @@ import (
 
 	"github.com/infobloxopen/terraform-provider-nios/internal/flex"
 	planmodifiers "github.com/infobloxopen/terraform-provider-nios/internal/planmodifiers/immutable"
+	"github.com/infobloxopen/terraform-provider-nios/internal/utils"
 )
 
 type TftpfiledirModel struct {
@@ -131,6 +132,10 @@ func (m *TftpfiledirModel) Flatten(ctx context.Context, from *misc.Tftpfiledir, 
 	}
 	m.Ref = flex.FlattenStringPointer(from.Ref)
 	m.Uuid = flex.FlattenStringPointer(from.Uuid)
+	// tftpfiledir API does not return uuid; derive from ref if empty
+	if m.Uuid.ValueString() == "" && from.Ref != nil && *from.Ref != "" {
+		m.Uuid = types.StringValue(utils.ExtractResourceRef(*from.Ref))
+	}
 	m.Directory = flex.FlattenStringPointer(from.Directory)
 	m.IsSyncedToGm = types.BoolPointerValue(from.IsSyncedToGm)
 	m.LastModify = flex.FlattenInt64Pointer(from.LastModify)
