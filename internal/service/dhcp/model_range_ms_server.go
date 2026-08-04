@@ -52,7 +52,10 @@ func (m *RangeMsServerModel) Expand(ctx context.Context, diags *diag.Diagnostics
 	}
 	to := &dhcp.RangeMsServer{
 		Ipv4addr: flex.ExpandStringPointer(m.Ipv4addr),
-		Address:  flex.ExpandStringPointer(m.Ipv4addr),
+	}
+	// WAPI v2.14 requires 'address' for msdhcpserver.
+	if !m.Ipv4addr.IsNull() && !m.Ipv4addr.IsUnknown() {
+		to.Address = flex.ExpandStringPointer(m.Ipv4addr)
 	}
 	// WAPI v2.14 requires 'address' for msdhcpserver.
 	if !m.Ipv4addr.IsNull() && !m.Ipv4addr.IsUnknown() {

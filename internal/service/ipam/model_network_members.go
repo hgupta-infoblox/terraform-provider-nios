@@ -114,10 +114,4 @@ func (m *NetworkMembersModel) Flatten(ctx context.Context, from *ipam.NetworkMem
 	}
 	m.Ipv6addr = flex.FlattenStringPointer(from.Ipv6addr)
 	m.Name = flex.FlattenStringPointer(from.Name)
-	// NIOS returns msdhcpserver address in Name, not Ipv4addr
-	if from.Struct != nil && *from.Struct == "msdhcpserver" {
-		m.Ipv4addr = flex.FlattenStringPointer(from.Name)
-	} else {
-		m.Ipv4addr = flex.FlattenStringPointer(from.Ipv4addr)
-	}
 }
