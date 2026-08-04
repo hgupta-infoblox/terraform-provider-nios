@@ -71,6 +71,9 @@ func (m *Ipv6networkMembersModel) Expand(ctx context.Context, diags *diag.Diagno
 		Ipv4addr: flex.ExpandStringPointer(m.Ipv4addr),
 		Ipv6addr: flex.ExpandStringPointer(m.Ipv6addr),
 		Name:     flex.ExpandStringPointer(m.Name),
+		AdditionalProperties: map[string]interface{}{
+			"_struct": "dhcpmember",
+		},
 	}
 	if !m.Struct.IsNull() && !m.Struct.IsUnknown() && m.Struct.ValueString() != "" {
 		to.AdditionalProperties = map[string]interface{}{
