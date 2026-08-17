@@ -321,7 +321,6 @@ func TestAccRecordPtrResource_Ipv4addr(t *testing.T) {
 // TestAccRecordPtrResource_FuncCallIpv4Addr tests the "func_call" attribute functionality
 // which allocates IP addresses using next_available_ip.
 func TestAccRecordPtrResource_FuncCallIpv4Addr(t *testing.T) {
-	t.Skip("TODO - TO BE FIXED IN FUTURE RELEASES FOR INTEGRATION TESTS")
 	var resourceName = "nios_dns_record_ptr.test_func_call"
 	var v dns.RecordPtr
 	ptrDName := acctest.RandomNameWithPrefix("ptr") + ".example.com"
@@ -504,6 +503,30 @@ func TestAccRecordPtrResource_UseTtl(t *testing.T) {
 					resource.TestCheckResourceAttr(resourceName, "use_ttl", "false"),
 				),
 			},
+			// Delete testing automatically occurs in TestCase
+		},
+	})
+}
+
+func TestAccRecordPtrResource_View(t *testing.T) {
+	var resourceName = "nios_dns_record_ptr.test_view"
+	var v dns.RecordPtr
+	ptrDName := acctest.RandomNameWithPrefix("ptr") + ".example.com"
+	viewName := acctest.RandomNameWithPrefix("view")
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:                 func() { acctest.PreCheck(t) },
+		ProtoV6ProviderFactories: acctest.ProtoV6ProviderFactories,
+		Steps: []resource.TestStep{
+			// Create and Read
+			{
+				Config: testAccRecordPtrView("192.168.10.30", ptrDName, viewName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckRecordPtrExists(context.Background(), resourceName, &v),
+					resource.TestCheckResourceAttr(resourceName, "view", viewName),
+				),
+			},
+			// Update is not applicable as view is an immutable field.
 			// Delete testing automatically occurs in TestCase
 		},
 	})
@@ -744,4 +767,24 @@ resource "nios_dns_record_ptr" "test_use_ttl" {
 	ttl = %d
 }
 `, ipv6addr, ptrdname, view, useTtl, ttl)
+}
+
+func testAccRecordPtrView(ipv4addr, ptrdname, view string) string {
+	return fmt.Sprintf(`
+resource "nios_dns_view" "test_dns_view" {
+	name = %q
+}
+
+resource "nios_dns_zone_auth" "test_dns_zone" {
+	fqdn = "192.168.10.0/24"
+	zone_format = "IPV4"
+	view = nios_dns_view.test_dns_view.name
+}
+
+resource "nios_dns_record_ptr" "test_view" {
+	ipv4addr = %q
+	ptrdname = %q
+	view     = nios_dns_zone_auth.test_dns_zone.view
+}
+`, view, ipv4addr, ptrdname)
 }
